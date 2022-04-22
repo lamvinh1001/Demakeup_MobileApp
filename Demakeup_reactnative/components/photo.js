@@ -72,8 +72,9 @@ function PhotoScreen({ navigation, route }) {
     };
 
     const generate = async () => {
+        // http://13.250.97.192:5000/post
 
-        const res = await fetch("", {
+        const res = await fetch("http://13.215.184.142:5000/post", {
             // url 
             method: 'POST',
             headers: {
@@ -214,8 +215,13 @@ function PhotoScreen({ navigation, route }) {
                     <TouchableOpacity
                         style={styles.buttonTitle}
                         onPress={async () => {
+                            var start = new Date().getTime();
+
+
                             await generate();
-                            const rs = await fetch('', {
+                            // http://13.250.97.192:5000/predict
+
+                            const rs = await fetch("http://13.215.184.142:5000/predict", {
                                 method: 'GET',
                                 headers: {
                                     'Accept': 'application/string',
@@ -227,10 +233,14 @@ function PhotoScreen({ navigation, route }) {
 
                                 navigation.push('GeneratorScreen', {
                                     post: data,
+                                    timeGenerator: Math.abs(start - new Date().getTime()) / 1000,
                                 }
                                 )
 
                             })
+                            // var end = new Date().getTime();
+                            // console.log("Call to doSomething took " + (start - end) + " milliseconds.")
+
 
                         }}
                     >

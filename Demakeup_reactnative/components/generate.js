@@ -29,8 +29,11 @@ function GeneratorScreen({ navigation, route }) {
                 }}
             >
                 <Text
-                    style={{ fontWeight: "bold", fontSize: 20, marginBottom: 50 }}
+                    style={{ fontWeight: "bold", fontSize: 20, marginBottom: 30 }}
                 > Output </Text>
+                <Text
+                    style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10 }}
+                > It take {route.params?.timeGenerator} seconds to generate </Text>
                 <Image
                     style={styles.imageField}
                     // source={require('../assets/unknow.png')}
