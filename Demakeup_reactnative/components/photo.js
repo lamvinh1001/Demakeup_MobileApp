@@ -74,7 +74,7 @@ function PhotoScreen({ navigation, route }) {
     const generate = async () => {
         // http://13.250.97.192:5000/post
 
-        const res = await fetch("http://13.215.184.142:5000/post", {
+        const res = await fetch("http://18.141.182.184:5000/post", {
             // url 
             method: 'POST',
             headers: {
@@ -216,12 +216,10 @@ function PhotoScreen({ navigation, route }) {
                         style={styles.buttonTitle}
                         onPress={async () => {
                             var start = new Date().getTime();
-
-
                             await generate();
                             // http://13.250.97.192:5000/predict
 
-                            const rs = await fetch("http://13.215.184.142:5000/predict", {
+                            const rs = await fetch("http://18.141.182.184:5000/predict", {
                                 method: 'GET',
                                 headers: {
                                     'Accept': 'application/string',

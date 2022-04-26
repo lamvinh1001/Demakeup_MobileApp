@@ -6,4 +6,4 @@ tensorflow_addons
 Pillow
 numpy
 pillow
-matplotlib
+gfpgan

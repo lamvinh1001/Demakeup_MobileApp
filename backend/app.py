@@ -3,11 +3,10 @@ import base64
 import numpy as np
 from models import Generator
 from utils import extract_face, generate
-
+from io import BytesIO
 from PIL import Image
-import cv2
 from gfpgan import GFPGANer
-import time
+
 app = Flask(__name__)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
@@ -40,7 +39,6 @@ def save_base64():
         image_uri = str(request.form['uri'])
         # if image_uri and image_base64:
         name = image_uri.split('/')[-1]
-
         session['image_name'] = name
         with open("images/"+session['image_name'], "wb") as f:
             f.write(base64.b64decode(image_base64))
@@ -56,7 +54,6 @@ def send_base64():
     # global key
     # start = time.time()
     if "image_name" in session:
-
         # start = time.time()
         image_name = session["image_name"]
         path = "images/" + str(image_name)
@@ -65,28 +62,20 @@ def send_base64():
 
         face_image = extract_face(image)
         image_generate = generate(face_image, generator)
+        pill_imgG = Image.fromarray((image_generate * 255).astype(np.uint8))
 
-        pill_im = Image.fromarray((image_generate * 255).astype(np.uint8))
+        _, _, img_enhance = face_enhancer.enhance(
+            np.array(pill_imgG)[:, :, ::-1], has_aligned=False, only_center_face=False, paste_back=True)
 
-        pill_im.save(path)
-        # print(time.time() - start)
-
-        in_img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-        #start1 = time.time()
-
-        _, _, output1 = face_enhancer.enhance(
-            in_img, has_aligned=False, only_center_face=False, paste_back=True)
-        # print(output1.shape)
-        cv2.imwrite(path, output1)
-        with open(path, "rb") as image_file:
-            data = base64.b64encode(image_file.read())
-        # print('gen take' + str(time.time() - start))
-        # print(time.time() - start1)
-        return data
+        pill_imgE = Image.fromarray(img_enhance[:, :, [2, 1, 0]])
+        buffered = BytesIO()
+        pill_imgE.save(buffered, format="JPEG")
+        result = base64.b64encode(buffered.getvalue())
+        return result
     else:
         return jsonify({'status': 'Gen Error!'})
 
 
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0', port='8000', debug=True, threaded=True)
-    app.run(threaded=True)
+    app.run(host='0.0.0.0', port='8000', debug=True, threaded=True)
+    # app.run(threaded=True)
