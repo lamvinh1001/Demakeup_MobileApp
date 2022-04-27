@@ -6,22 +6,22 @@ from utils import extract_face, generate
 from io import BytesIO
 from PIL import Image
 from gfpgan import GFPGANer
-
+import os
 app = Flask(__name__)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 1
-app.secret_key = '192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcba'
+app.secret_key = 'my-kltn'
 # -----------------
+
+generator = Generator(HEIGHT=256, WIDTH=256)
+generator.load_weights('weight/Originalc_generator.h5')
+print('Loaded Cycle GAN')
 
 face_enhancer = GFPGANer(
     upscale=2.5,
     model_path='weight/GFPGANv1.3.pth')
 
 print('Loaded GFPGAN')
-
-generator = Generator(HEIGHT=256, WIDTH=256)
-generator.load_weights('weight/Originalc_generator.h5')
-print('Loaded Cycle GAN')
 
 
 @app.route('/')
@@ -51,23 +51,26 @@ def save_base64():
 
 @app.route('/predict', methods=['GET'])
 def send_base64():
-    # global key
-    # start = time.time()
+    import time
     if "image_name" in session:
-        # start = time.time()
-        image_name = session["image_name"]
-        path = "images/" + str(image_name)
+       # load image
+        img_name = session["image_name"]
+        path = "images/" + str(img_name)
+        original_img = Image.open(path)
 
-        image = Image.open(path)
+        # extract face
+        face_img = extract_face(original_img)
+        os.remove(path)
+        # using CycleGAN to generate de-makeup face thực thi ~2.3s ở local
+        img_generate = generate(face_img, generator)
+        pill_imgG = Image.fromarray((img_generate * 255).astype(np.uint8))
 
-        face_image = extract_face(image)
-        image_generate = generate(face_image, generator)
-        pill_imgG = Image.fromarray((image_generate * 255).astype(np.uint8))
-
-        _, _, img_enhance = face_enhancer.enhance(
-            np.array(pill_imgG)[:, :, ::-1], has_aligned=False, only_center_face=False, paste_back=True)
-
+        # using gfpgan to enhance face thực thi ~ 3.5s ở local
+        _, _, img_enhance = face_enhancer.enhance(np.array(
+            pill_imgG)[:, :, ::-1], has_aligned=False, only_center_face=False, paste_back=True)
         pill_imgE = Image.fromarray(img_enhance[:, :, [2, 1, 0]])
+
+        # conver to base64
         buffered = BytesIO()
         pill_imgE.save(buffered, format="JPEG")
         result = base64.b64encode(buffered.getvalue())
@@ -77,5 +80,5 @@ def send_base64():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port='8000', debug=True, threaded=True)
+    app.run(host='0.0.0.0', port='8000', threaded=True)
     # app.run(threaded=True)

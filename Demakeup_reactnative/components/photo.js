@@ -8,12 +8,12 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 function PhotoScreen({ navigation, route }) {
     const [hasPermission, setHasPermission] = useState();
     const cameraRef = useRef();
-    const [type, setType] = useState(Camera.Constants.Type.front);
+    const [type, setType] = useState(Camera.Constants.Type.back);
     const [showCamera, setShowCamera] = useState(true);
     const [base64Image, setBase64] = useState();
     const [formData, setFormData] = useState(new FormData());
-    const [imageGenerator, setResultGenerator] = useState();
 
+    const [isLoading, setIsLoading] = useState(true)
     useEffect(() => {
         (async () => {
             const { status } = await Camera.requestCameraPermissionsAsync();
@@ -55,7 +55,7 @@ function PhotoScreen({ navigation, route }) {
     const pickImage = async () => {
         // No permissions request is necessary for launching the image library
         let rs = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [5, 6],
             quality: 1,
@@ -74,7 +74,7 @@ function PhotoScreen({ navigation, route }) {
     const generate = async () => {
         // http://13.250.97.192:5000/post
 
-        const res = await fetch("http://18.141.182.184:5000/post", {
+        const res = await fetch("http://ec2-52-221-239-251.ap-southeast-1.compute.amazonaws.com:8000/post", {
             // url 
             method: 'POST',
             headers: {
@@ -162,94 +162,109 @@ function PhotoScreen({ navigation, route }) {
         )
     }
     else {
-        return (
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-
-            >
+        if (!isLoading) {
+            return (
+                <View style={{ justifyContent: 'center', backgroundColor: '#d3d3d3', textAlign: 'center', height: '100%', width: '100%' }}>
+                    <ActivityIndicator
+                        color='black'
+                        size='large'
+                        animated={false}
+                    />
+                    <Text style={{ textAlign: 'center', fontSize: 18, fontWeight: 'bold', marginTop: 5 }}>Is in the process of generating
+                        original face</Text>
+                </View>
+            )
+        }
+        else {
+            return (
                 <View
                     style={{
+                        flex: 1,
                         justifyContent: "center",
                         alignItems: "center",
-
                     }}
+
                 >
-
-                    <Text
-                        style={{ fontWeight: "bold", fontSize: 20, marginBottom: 50 }}
-                    > Input </Text>
-
-                    <View>
-                        {base64Image ?
-                            <Image
-                                style={styles.imageField}
-
-                                source={{ uri: 'data:image/png;base64,' + base64Image }}
-                            />
-                            : <Image
-                                style={styles.imageField}
-
-                                source={require('../assets/unknow.png')}
-                            />}
-
-                    </View>
-                </View>
-
-
-                <View style={{ flexDirection: 'row', }}>
-                    <TouchableOpacity
-                        style={styles.buttonTitle}
-                        onPress={async () =>
-                            setShowCamera(true)
-                        }
-                    >
-                        <Text
-                            style={styles.buttonText}
-                        > Picture Again</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={styles.buttonTitle}
-                        onPress={async () => {
-                            var start = new Date().getTime();
-                            await generate();
-                            // http://13.250.97.192:5000/predict
-
-                            const rs = await fetch("http://18.141.182.184:5000/predict", {
-                                method: 'GET',
-                                headers: {
-                                    'Accept': 'application/string',
-                                    'Content-Type': 'application/string',
-                                },
-                            }).then((response) => {
-                                return response.text();
-                            }).then((data) => {
-
-                                navigation.push('GeneratorScreen', {
-                                    post: data,
-                                    timeGenerator: Math.abs(start - new Date().getTime()) / 1000,
-                                }
-                                )
-
-                            })
-                            // var end = new Date().getTime();
-                            // console.log("Call to doSomething took " + (start - end) + " milliseconds.")
-
+                    <View
+                        style={{
+                            justifyContent: "center",
+                            alignItems: "center",
 
                         }}
                     >
+
                         <Text
-                            style={styles.buttonText}
-                        > Generate Face</Text>
-                    </TouchableOpacity>
-                </View>
+                            style={{ fontWeight: "bold", fontSize: 20, marginBottom: 50 }}
+                        > Input </Text>
+
+                        <View>
+                            {base64Image ?
+                                <Image
+                                    style={styles.imageField}
+
+                                    source={{ uri: 'data:image/png;base64,' + base64Image }}
+                                />
+                                : <Image
+                                    style={styles.imageField}
+
+                                    source={require('../assets/unknow.png')}
+                                />}
+
+                        </View>
+                    </View>
 
 
-            </View>);
+                    <View style={{ flexDirection: 'row', }}>
+                        <TouchableOpacity
+                            style={styles.buttonTitle}
+                            onPress={async () =>
+                                setShowCamera(true)
+                            }
+                        >
+                            <Text
+                                style={styles.buttonText}
+                            > Picture Again</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.buttonTitle}
+                            onPress={async () => {
+                                setIsLoading(false);
+                                var start = new Date().getTime();
+                                await generate();
+                                // http://13.250.97.192:5000/predict
+
+                                const rs = await fetch("http://ec2-52-221-239-251.ap-southeast-1.compute.amazonaws.com:8000/predict", {
+                                    method: 'GET',
+                                    headers: {
+                                        'Accept': 'application/string',
+                                        'Content-Type': 'application/string',
+                                    },
+                                }).then((response) => {
+                                    return response.text();
+                                }).then((data) => {
+
+                                    navigation.push('GeneratorScreen', {
+                                        post: data,
+                                        timeGenerator: Math.abs(start - new Date().getTime()) / 1000,
+                                    }
+                                    )
+                                }).finally(() => setIsLoading(true))
+
+
+
+                            }}
+                        >
+                            <Text
+                                style={styles.buttonText}
+                            > Generate Face</Text>
+                        </TouchableOpacity>
+                    </View>
+
+
+                </View>);
+        }
+
 
     }
 

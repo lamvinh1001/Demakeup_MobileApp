@@ -11,7 +11,6 @@ function GeneratorScreen({ navigation, route }) {
         }
     }, [route.params?.post]);
     return (
-
         <View
             style={{
                 flex: 1,
