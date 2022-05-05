@@ -1,5 +1,5 @@
 # How to run server
-flask run --host 0.0.0.0 --port 8000
+gunicorn --workers 4 --bind 0.0.0.0:5000 wsgi:app
 
 # frontend
 Camera capture app (android)
