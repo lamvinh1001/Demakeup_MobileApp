@@ -74,7 +74,7 @@ function PhotoScreen({ navigation, route }) {
     const generate = async () => {
         // http://13.250.97.192:5000/post
 
-        const res = await fetch("http://ec2-52-221-239-251.ap-southeast-1.compute.amazonaws.com:8000/post", {
+        const res = await fetch("http://ec2-18-136-212-145.ap-southeast-1.compute.amazonaws.com:8000/post", {
             // url 
             method: 'POST',
             headers: {
@@ -170,8 +170,7 @@ function PhotoScreen({ navigation, route }) {
                         size='large'
                         animated={false}
                     />
-                    <Text style={{ textAlign: 'center', fontSize: 18, fontWeight: 'bold', marginTop: 5 }}>Is in the process of generating
-                        original face</Text>
+                    <Text style={{ textAlign: 'center', fontSize: 18, fontWeight: 'bold', marginTop: 5 }}>Is in the process of generating</Text>
                 </View>
             )
         }
@@ -234,7 +233,7 @@ function PhotoScreen({ navigation, route }) {
                                 await generate();
                                 // http://13.250.97.192:5000/predict
 
-                                const rs = await fetch("http://ec2-52-221-239-251.ap-southeast-1.compute.amazonaws.com:8000/predict", {
+                                const rs = await fetch("http://ec2-18-136-212-145.ap-southeast-1.compute.amazonaws.com:8000/predict", {
                                     method: 'GET',
                                     headers: {
                                         'Accept': 'application/string',

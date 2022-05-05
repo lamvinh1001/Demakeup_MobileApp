@@ -1,9 +1,10 @@
+gunicorn
+torch
+torchvision
+opencv-python
 mtcnn==0.1.1
 tensorflow==2.4.1
 Flask
-opencv-python==4.5.5.62
 tensorflow_addons
 Pillow
-numpy
-pillow
 gfpgan
