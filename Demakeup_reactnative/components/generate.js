@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native'
+import Swiper from 'react-native-swiper/src';
+
 
 
 function GeneratorScreen({ navigation, route }) {
@@ -8,73 +10,164 @@ function GeneratorScreen({ navigation, route }) {
         if (route.params?.post) {
             // Post updated, do something with `route.params.post`
             // For example, send the post to the server
+
         }
     }, [route.params?.post]);
-    return (
-        <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-
-        >
-
+    if (route.params?.post) {
+        return (
             <View
                 style={{
-
+                    flex: 1,
                     justifyContent: "center",
                     alignItems: "center",
                 }}
+
             >
-                <Text
-                    style={{ fontWeight: "bold", fontSize: 20, marginBottom: 30 }}
-                > Output </Text>
-                <Text
-                    style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10 }}
-                > It take {route.params?.timeGenerator} seconds to generate </Text>
-                <Image
-                    style={styles.imageField}
-                    // source={require('../assets/unknow.png')}
-                    source={{ uri: 'data:image/png;base64,' + route.params?.post }}
-                />
-            </View>
 
-            <View style={{ flexDirection: 'row', }}>
-                <TouchableOpacity
-                    style={styles.buttonTitle}
-                    onPress={() =>
-                        navigation.navigate('PhotoScreen',)
-                    }
+                <View
+                    style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+
+                    }}
                 >
                     <Text
-                        style={{ fontSize: 15, color: '#fff', fontWeight: 'bold' }}
-                    > Try Again</Text>
-                </TouchableOpacity>
+                        style={{ fontWeight: "bold", fontSize: 20, marginTop: 50 }}
+                    >  Take {route.params?.timeGenerator} seconds to generate </Text>
+                    <Swiper>
+                        <View
+                            style={{
+                                justifyContent: "center",
+                                alignItems: "center",
+                                marginTop: 35
+                            }}>
 
-                <TouchableOpacity
-                    style={styles.buttonTitle}
-                    onPress={() =>
-                        navigation.popToTop()
-                    }
+                            <Image
+                                style={styles.imageField}
+
+                                source={{ uri: 'data:image/png;base64,' + route.params?.post }}
+                            />
+                        </View>
+                        <View style={{
+                            justifyContent: "center",
+                            alignItems: "center",
+                            marginTop: 35
+                        }}>
+
+                            <Image
+                                style={styles.imageField}
+                                source={{ uri: 'data:image/png;base64,' + route.params?.curr }}
+                            />
+                        </View>
+                    </Swiper>
+                    <View style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity
+                            style={styles.buttonTitle}
+                            onPress={() =>
+                                navigation.navigate('PhotoScreen',)
+                            }
+                        >
+                            <Text
+                                style={{ fontSize: 15, color: '#fff', fontWeight: 'bold' }}
+                            > Continue</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.buttonTitle}
+                            onPress={() =>
+                                navigation.popToTop()
+                            }
+                        >
+                            <Text
+                                style={{ fontSize: 15, color: '#fff', fontWeight: 'bold' }}
+                            > Quit</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View >
+
+        );
+    }
+    else {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+
+            >
+
+                <View
+                    style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+
+                    }}
                 >
-
                     <Text
-                        style={{ fontSize: 15, color: '#fff', fontWeight: 'bold' }}
-                    > Quit</Text>
-                </TouchableOpacity>
-            </View>
+                        style={{ fontWeight: "bold", fontSize: 20, marginTop: 50 }}
+                    >  Image is not available for generating</Text>
+                    <Swiper>
+                        <View
+                            style={{
+                                justifyContent: "center",
+                                alignItems: "center",
+                                marginTop: 35
+                            }}>
 
+                            <Image
+                                style={styles.imageField}
+                                source={require('../assets/unknow.png')}
+                            />
+                        </View>
+                        <View style={{
+                            justifyContent: "center",
+                            alignItems: "center",
+                            marginTop: 35
+                        }}>
 
-        </View >
+                            <Image
+                                style={styles.imageField}
+                                source={{ uri: 'data:image/png;base64,' + route.params?.curr }}
+                            />
+                        </View>
+                    </Swiper>
+                    <View style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity
+                            style={styles.buttonTitle}
+                            onPress={() =>
+                                navigation.navigate('PhotoScreen',)
+                            }
+                        >
+                            <Text
+                                style={{ fontSize: 15, color: '#fff', fontWeight: 'bold' }}
+                            > Try Again</Text>
+                        </TouchableOpacity>
 
+                        <TouchableOpacity
+                            style={styles.buttonTitle}
+                            onPress={() =>
+                                navigation.popToTop()
+                            }
+                        >
+                            <Text
+                                style={{ fontSize: 15, color: '#fff', fontWeight: 'bold' }}
+                            > Quit</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View >
 
-    );
+        );
+    }
+
 }
 export const styles = StyleSheet.create({
 
     imageField: {
-        marginBottom: 50,
+        // marginBottom: 50,
         width: 410,
         height: 410,
     },

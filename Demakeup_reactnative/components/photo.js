@@ -19,7 +19,7 @@ function PhotoScreen({ navigation, route }) {
             const { status } = await Camera.requestCameraPermissionsAsync();
             setHasPermission(status === 'granted');
 
-
+            setIsLoading(true)
             // picker permission
 
             if (Platform.OS !== 'web') {
@@ -46,6 +46,7 @@ function PhotoScreen({ navigation, route }) {
                     quality: 1,
                     base64: true,
                 });
+
                 return photo;
             } catch (e) {
                 console.log(e);
@@ -71,25 +72,23 @@ function PhotoScreen({ navigation, route }) {
         }
     };
 
-    const generate = async () => {
-        // http://13.250.97.192:5000/post
+    // const generate = async () => {
+    //     // http://13.250.97.192:5000/post
 
-        const res = await fetch("http://ec2-18-136-212-145.ap-southeast-1.compute.amazonaws.com:8000/post", {
-            // url 
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'multipart/form-data',
-            },
-            body: formData
+    //     const res = await fetch("http://ec2-54-179-206-88.ap-southeast-1.compute.amazonaws.com:8000/post", {
+    //         // url  
+    //         method: 'POST',
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'multipart/form-data',
+    //         },
+    //         body: formData
 
-        }).then(res => { console.log("Sent") })
-            .catch(res => { console.log('Error') })
-
-
+    //     }).then(res => { console.log("Sent") })
+    //         .catch(res => { console.log('Error') })
 
 
-    }
+    // }
 
     if (showCamera) {
         return (
@@ -230,28 +229,44 @@ function PhotoScreen({ navigation, route }) {
                             onPress={async () => {
                                 setIsLoading(false);
                                 var start = new Date().getTime();
-                                await generate();
+                                // await generate();
                                 // http://13.250.97.192:5000/predict
 
-                                const rs = await fetch("http://ec2-18-136-212-145.ap-southeast-1.compute.amazonaws.com:8000/predict", {
-                                    method: 'GET',
+                                // const rs = await fetch("http://ec2-54-179-206-88.ap-southeast-1.compute.amazonaws.com:8000/predict", {
+                                //     method: 'GET',
+                                //     headers: {
+                                //         'Accept': 'application/string',
+                                //         'Content-Type': 'application/string',
+                                //     },
+                                // }).then((response) => {
+                                //     return response.text();
+                                // }).then((data) => {
+
+                                //     navigation.push('GeneratorScreen', {
+                                //         post: data,
+                                //         timeGenerator: Math.abs(start - new Date().getTime()) / 1000,
+                                //     }
+                                //     )
+                                // }).finally(() => setIsLoading(true))
+
+                                const res = await fetch("https://2cc0-115-79-196-184.ap.ngrok.io/generate", {
+                                    // url  
+                                    method: 'POST',
                                     headers: {
-                                        'Accept': 'application/string',
-                                        'Content-Type': 'application/string',
+                                        'Accept': 'application/json',
+                                        'Content-Type': 'multipart/form-data',
                                     },
+                                    body: formData
+
                                 }).then((response) => {
                                     return response.text();
                                 }).then((data) => {
-
                                     navigation.push('GeneratorScreen', {
                                         post: data,
+                                        curr: base64Image,
                                         timeGenerator: Math.abs(start - new Date().getTime()) / 1000,
-                                    }
-                                    )
+                                    })
                                 }).finally(() => setIsLoading(true))
-
-
-
                             }}
                         >
                             <Text
