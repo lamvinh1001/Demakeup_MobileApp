@@ -14,8 +14,7 @@ from werkzeug.utils import secure_filename
 
 BUTKET_NAME = 'demokltn'
 
-ACCESS_KEY_ID = 'AKIAZTKA3HOVTB3CEEBK'
-ACCESS_SECRET_KEY = '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'
+
 s3 = boto3.client('s3',
                   aws_access_key_id=ACCESS_KEY_ID,
                   aws_secret_access_key=ACCESS_SECRET_KEY)
